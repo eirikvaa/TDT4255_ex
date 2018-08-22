@@ -27,5 +27,16 @@ class CyclicDot(elements: Int, dataWidth: Int) extends Module{
     */
   // Increment the value of the accumulator with the product of data in A and B
   // When the counter reaches elements set output valid to true and flush the accumulator
+  io.outputValid := false.B
+  io.dataOut := 0.U
 
+  when (counter.value === (elements - 1).U) {
+	io.dataOut := accumulator + (io.dataInA * io.dataInB)
+	io.outputValid := true.B
+	accumulator := 0.U
+  }.otherwise {
+	accumulator := accumulator + (io.dataInA * io.dataInB)
+  }
+
+  counter.inc()
 }

@@ -27,7 +27,24 @@ class CyclicVector(elements: Int, dataWidth: Int) extends Module{
     Your implementation here
     */
   // Cycle the currentIndex register, it should be equal to the current (cycle % elements)
-
+  when (currentIndex === (elements - 1).U) {
+	currentIndex := 0.U
+  }.otherwise {
+	currentIndex := currentIndex + 1.U
+  }
   // Connect the selected output to io.dataOut
   // Connect writeEnable to the selected memory (selectable with memory(currentIndex))
+  io.dataOut := 0.U
+
+  // One could maybe have done this with a simple io.dataOut := memory(currentIndex),
+  // but currentIndex is an UInt and subscripting a list requires an int.
+  // Darn you, compiler.
+  for (i <- 0 until elements) {
+	when (i.asUInt() === currentIndex) {
+	  io.dataOut := memory(i)
+	  when (io.writeEnable === true.B) {
+		memory(i) := io.dataIn
+	  }
+	}
+  }
 }

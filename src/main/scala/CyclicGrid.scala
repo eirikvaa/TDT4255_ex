@@ -24,4 +24,19 @@ class CyclicVectorGrid(dims: Dims, dataWidth: Int) extends Module{
   /**
     Your implementation here
     */
+  io.dataOut := 0.U
+
+  for (i <- rows.indices) {
+	// For the most part this should just pass the signals along to the
+	// different vectors.
+	rows(i).dataIn := 0.U
+	rows(i).writeEnable := false.B
+
+	// Send in the data to the appropriate vector if we should write.
+	when (io.rowSelect === i.U) {
+	  rows(i).dataIn := io.dataIn
+	  rows(i).writeEnable := io.writeEnable
+	  io.dataOut := rows(i).dataOut
+	}
+  }
 }
